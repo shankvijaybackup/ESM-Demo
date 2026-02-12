@@ -7596,6 +7596,21 @@ if (atomicworkUsers.length > 0) {
 let attendance = [];
 let leaveRequests = [
   {
+    "id": "LV-ad5d37f5",
+    "employeeId": 17356,
+    "employeeName": "Ananya Gupta",
+    "type": "annual",
+    "startDate": "2026-03-01",
+    "endDate": "2026-03-05",
+    "days": 5,
+    "status": "approved",
+    "appliedAt": "2026-02-12T11:34:49.443Z",
+    "approver": "AUTO",
+    "approvalNotes": "Auto-approved via Atomicwork Webhook (Manual Fix)",
+    "approvalComment": "",
+    "metadata": {}
+  },
+  {
     "id": "LV-3bbfacfb",
     "employeeId": 55600,
     "employeeName": "311 AI",
