@@ -1,0 +1,108 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║            🚀 SAGE HR SINGAPORE - RENDER DEPLOYMENT                  ║
+║                     QUICK START GUIDE                                ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📍 YOU ARE HERE:
+   /Users/vijayshankar/sage-hr-mock
+   ✅ All files committed
+   ✅ Ready to deploy
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔥 STEP 1: CREATE GITHUB REPOSITORY (1 minute)
+
+1. Open browser: https://github.com/new
+2. Repository name: sage-hr-singapore
+3. Public/Private: Your choice
+4. ⚠️  DO NOT check "Add README" (we already have one)
+5. Click "Create repository"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔥 STEP 2: PUSH TO GITHUB (1 minute)
+
+Run these commands in terminal:
+
+cd /Users/vijayshankar/sage-hr-mock
+
+# Replace YOUR_USERNAME with your actual GitHub username
+git remote add origin https://github.com/YOUR_USERNAME/sage-hr-singapore.git
+
+git branch -M main
+
+git push -u origin main
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔥 STEP 3: DEPLOY ON RENDER (5 minutes)
+
+1. Go to: https://dashboard.render.com
+2. Click "New +" → "Web Service"
+3. Click "Connect account" (if needed)
+4. Select repository: sage-hr-singapore
+5. Click "Connect"
+
+Configure these settings:
+
+   ┌─────────────────────────────────────────┐
+   │ Name:          sage-hr-singapore        │
+   │ Region:        Singapore (or closest)   │
+   │ Branch:        main                     │
+   │ Root Dir:      (blank)                  │
+   │ Runtime:       Node                     │
+   │ Build:         npm install              │
+   │ Start:         npm start                │
+   │ Instance:      Free                     │
+   └─────────────────────────────────────────┘
+
+6. Click "Create Web Service"
+7. Wait 2-3 minutes for deployment
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔥 STEP 4: TEST YOUR DEPLOYMENT
+
+Your URL will be: https://sage-hr-singapore.onrender.com
+
+Browser Test:
+1. Open URL in browser
+2. You should see employee list
+3. Click on any employee
+4. Click "Documents" tab
+5. Click "Generate Payslip"
+6. Verify: Document shows "S$" (not ₹)
+
+API Test:
+curl https://sage-hr-singapore.onrender.com/api/employees
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 WHAT YOU'RE DEPLOYING:
+
+✅ 301 employees loaded
+✅ 4 document types (Tax, Payslip, Insurance, Letter)
+✅ Singapore format (IRAS, CPF, MediShield)
+✅ All amounts in SGD
+✅ REST API endpoints
+✅ Web UI
+✅ Atomicwork ready
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱️  TOTAL TIME: ~7 minutes
+💰 COST: FREE (Render Free Tier)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 NEED HELP?
+
+Detailed Guide:    cat DEPLOY_NOW.md
+Render Docs:       cat RENDER_DEPLOYMENT.md
+API Guide:         cat ATOMICWORK_INTEGRATION_READY.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 START NOW: Follow Step 1 above! ⬆️
+
+╚══════════════════════════════════════════════════════════════════════╝
