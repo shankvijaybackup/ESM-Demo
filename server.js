@@ -26752,17 +26752,17 @@ function parseNLPIntent(text) {
   }
 
   // Attendance patterns
-  if (lowerText.match(/mark|check.in|clock.in|attendance/)) {
+  if (lowerText.match(/mark.*attendance|check.?in|clock.?in|attendance/)) {
     return { intent: 'mark_attendance', text };
   }
 
   // Leave balance check (before apply)
-  if (lowerText.match(/check|view|show.*(leave|pto|balance|vacation)/)) {
+  if (lowerText.match(/(check|view|show).*(leave|pto|balance|vacation)/)) {
     return { intent: 'check_leave_balance', text };
   }
 
   // Leave/PTO patterns (last - most general)
-  if (lowerText.match(/apply|request|take.*(leave|pto|time off|vacation|holiday)/)) {
+  if (lowerText.match(/(apply|request|take).*(leave|pto|time off|vacation|holiday)/)) {
     return { intent: 'apply_leave', text };
   }
 
@@ -26936,7 +26936,7 @@ app.post('/api/webhook/nlp', async (req, res) => {
 
       default:
         result = {
-          success: false,
+          success: true,
           message: 'Sorry, I could not understand your request. Please try again.',
           intent,
           suggestions: [
@@ -27516,6 +27516,7 @@ function processReimbursement(details, metadata = {}) {
     employeeName: employeeName,
     amount: amount,
     category: details.category || 'other',
+    description: details.description || `${(details.category || 'other').replace('_', ' ')} expense reimbursement`,
     status: metadata.approvalStatus || (amount <= autoApproveThreshold ? 'approved' : 'pending'),
     submittedAt: new Date().toISOString(),
     approver: metadata.approver || (amount <= autoApproveThreshold ? 'AUTO' : employee.manager),
@@ -27542,6 +27543,7 @@ function createPurchaseOrder(details, metadata = {}) {
     vendor: details.vendor || 'Unknown Vendor',
     items: details.items || 'Various items',
     amount: details.amount || 0,
+    description: details.description || `PO for ${details.items || 'various items'} from ${details.vendor || 'vendor'}`,
     status: 'pending_approval',
     requestedBy: details.requestedBy,
     createdAt: new Date().toISOString(),
@@ -27563,6 +27565,7 @@ function submitInvoice(details, metadata = {}) {
     invoiceNumber: details.invoiceNumber || `INV-${Date.now()}`,
     vendor: details.vendor || 'Unknown Vendor',
     amount: details.amount || 0,
+    description: details.description || `Invoice from ${details.vendor || 'vendor'}`,
     status: 'pending_verification',
     submittedBy: details.submittedBy,
     submittedAt: new Date().toISOString(),

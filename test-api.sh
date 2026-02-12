@@ -62,21 +62,21 @@ test_endpoint "Apply for 2-day leave (Auto-approve)" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Apply for 2 days annual leave from 2026-02-20 to 2026-02-21",
-        "employeeId": "EMP001"
+        "employeeId": "EMP055600"
     }'
 
 test_endpoint "Apply for 5-day leave (Manual approval)" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Request 5 days sick leave from 2026-03-01 to 2026-03-05",
-        "employeeId": "EMP002"
+        "employeeId": "EMP054521"
     }'
 
 test_endpoint "Check leave balance" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Check my leave balance",
-        "employeeId": "EMP001"
+        "employeeId": "EMP055600"
     }'
 
 # Attendance
@@ -86,14 +86,14 @@ test_endpoint "Mark attendance for EMP001" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Mark my attendance",
-        "employeeId": "EMP001"
+        "employeeId": "EMP055600"
     }'
 
 test_endpoint "Mark attendance for EMP003" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Clock in for today",
-        "employeeId": "EMP003"
+        "employeeId": "EMP051611"
     }'
 
 # Reimbursements
@@ -103,21 +103,21 @@ test_endpoint "Submit reimbursement $450 (Auto-approve)" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Submit reimbursement for $450 travel expense",
-        "employeeId": "EMP003"
+        "employeeId": "EMP051611"
     }'
 
 test_endpoint "Submit reimbursement $850 (Manual approval)" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Claim $850 for meal expenses",
-        "employeeId": "EMP002"
+        "employeeId": "EMP054521"
     }'
 
 test_endpoint "Submit office supplies reimbursement" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Reimburse me $120 for office supplies",
-        "employeeId": "EMP004"
+        "employeeId": "EMP054545"
     }'
 
 # Purchase Orders
@@ -127,14 +127,14 @@ test_endpoint "Create PO for textiles" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Create purchase order for $2500 vendor: ABC Textiles items: Cotton fabric, buttons",
-        "employeeId": "EMP002"
+        "employeeId": "EMP054521"
     }'
 
 test_endpoint "Create PO for equipment" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "PO for $5000 vendor: Machinery Inc items: Sewing machines",
-        "employeeId": "EMP005"
+        "employeeId": "EMP054524"
     }'
 
 # Invoices
@@ -144,14 +144,14 @@ test_endpoint "Submit invoice (should match PO)" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Submit invoice #INV-2026-001 vendor: ABC Textiles $2500",
-        "employeeId": "EMP002"
+        "employeeId": "EMP054521"
     }'
 
 test_endpoint "Submit invoice (no PO match)" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "Invoice INV-2026-002 from Random Vendor $999",
-        "employeeId": "EMP002"
+        "employeeId": "EMP054521"
     }'
 
 # Unknown Intent
@@ -161,7 +161,7 @@ test_endpoint "Unknown request" \
     "$API_BASE/webhook/nlp" \
     '{
         "text": "This is a random request that should not match any intent",
-        "employeeId": "EMP001"
+        "employeeId": "EMP055600"
     }'
 
 # Get all data

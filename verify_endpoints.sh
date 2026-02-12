@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BASE_URL="http://localhost:3000"
-EMPLOYEE_ID="E1001"
+EMPLOYEE_ID="EMP055600"
 
 echo "============================================="
 echo "       Sage HR Endpoint Verification"
