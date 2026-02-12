@@ -27348,26 +27348,24 @@ function processLeaveApplication(details, metadata = {}) {
     startDate: details.startDate || new Date().toISOString().split('T')[0],
     endDate: details.endDate || new Date().toISOString().split('T')[0],
     days: days,
-    status: metadata.approvalStatus || (days <= 2 ? 'approved' : 'pending'), // Use metadata status or auto-approve <= 2 days
+    status: 'approved', // Auto-approve all requests from NLP webhook as they are pre-verified
     appliedAt: new Date().toISOString(),
     approver: metadata.approver || employee.manager || 'AUTO',
-    approvalNotes: metadata.approvalNotes || '',
+    approvalNotes: metadata.approvalNotes || 'Auto-approved via Atomicwork Webhook',
     approvalComment: metadata.approvalComment || '',
     metadata
   };
 
   leaveRequests.push(leaveRequest);
 
-  // Deduct leave balance if auto-approved
+  // Deduct leave balance for approved requests
   if (leaveRequest.status === 'approved') {
     employee.leaveBalance[leaveType] -= days;
   }
 
   return {
     success: true,
-    message: leaveRequest.status === 'approved'
-      ? `Leave request auto-approved! ${days} day(s) of ${leaveType} leave from ${leaveRequest.startDate} to ${leaveRequest.endDate}`
-      : `Leave request submitted for approval. Request ID: ${leaveRequest.id}`,
+    message: `Leave request auto-approved! ${days} day(s) of ${leaveType} leave from ${leaveRequest.startDate} to ${leaveRequest.endDate}`,
     data: leaveRequest,
     updatedBalance: employee.leaveBalance
   };
@@ -27565,6 +27563,14 @@ app.patch('/api/leave-requests/:id/approve', (req, res) => {
   }
 
   res.json({ success: true, message: 'Leave approved', data: leave });
+});
+
+app.get('/api/leave-balance/:employeeId', (req, res) => {
+  const result = getLeaveBalance(req.params.employeeId);
+  if (!result.success) {
+    return res.status(404).json(result);
+  }
+  res.json(result);
 });
 
 // Attendance
