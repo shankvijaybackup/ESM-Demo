@@ -3,9 +3,14 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Atomicwork Configuration
+const ATOMICWORK_BASE_URL = process.env.ATOMICWORK_URL || 'https://atombanking.atomicwork.com';
+const ATOMICWORK_API_KEY = process.env.ATOMICWORK_API_KEY || 'aw_b2d3cda25daa4790b460edd9162616advkwta0';
 
 // Middleware
 app.use(cors());
@@ -26754,8 +26759,8 @@ function extractInvoiceDetails(text) {
 }
 
 // ==================== WEBHOOK ENDPOINT ====================
-app.post('/api/webhook/nlp', (req, res) => {
-  const { text, employeeId, metadata } = req.body;
+app.post('/api/webhook/nlp', async (req, res) => {
+  const { text, employeeId, metadata, ticketId, requestId } = req.body;
 
   if (!text) {
     return res.status(400).json({ error: 'Text is required' });
@@ -26799,6 +26804,13 @@ app.post('/api/webhook/nlp', (req, res) => {
         result = submitInvoice(invDetails, metadata);
         break;
 
+      case 'generate_payslip':
+      case 'generate_tax':
+      case 'generate_insurance':
+      case 'generate_letter':
+        result = await handleDocumentGeneration(text, employeeId, intent);
+        break;
+
       default:
         result = {
           success: false,
@@ -26813,14 +26825,38 @@ app.post('/api/webhook/nlp', (req, res) => {
         };
     }
 
+    // Format HTML response for Atomicwork
+    const htmlResponse = formatHTMLResponse(intent, result);
+
+    // Post to Atomicwork if ticketId provided
+    if (ticketId || requestId) {
+      const atomicworkTicketId = ticketId || requestId;
+      await postToAtomicwork(atomicworkTicketId, htmlResponse);
+    }
+
+    // Return response
     res.json({
       success: true,
       intent,
       originalText: text,
+      htmlResponse,
       ...result
     });
 
   } catch (error) {
+    console.error('NLP Webhook Error:', error);
+
+    // Post error to Atomicwork if ticketId provided
+    if (ticketId || requestId) {
+      const atomicworkTicketId = ticketId || requestId;
+      const errorHTML = `<div style="padding: 15px; background-color: #fee; border-left: 4px solid #f44; border-radius: 4px;">
+        <h3 style="color: #f44; margin: 0 0 10px 0;">❌ Error Processing Request</h3>
+        <p style="margin: 0;"><strong>Error:</strong> ${error.message}</p>
+        <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Please try again or contact HR support.</p>
+      </div>`;
+      await postToAtomicwork(atomicworkTicketId, errorHTML);
+    }
+
     res.status(500).json({
       success: false,
       error: error.message,
@@ -26828,6 +26864,388 @@ app.post('/api/webhook/nlp', (req, res) => {
     });
   }
 });
+
+// ==================== ATOMICWORK INTEGRATION ====================
+async function postToAtomicwork(ticketId, htmlDescription) {
+  try {
+    const response = await axios.post(
+      `${ATOMICWORK_BASE_URL}/api/v1/requests/${ticketId}/activity-notes`,
+      {
+        is_private: 'false',
+        description: htmlDescription,
+        source: 'PORTAL'
+      },
+      {
+        headers: {
+          'x-api-key': ATOMICWORK_API_KEY,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    console.log(`✅ Posted to Atomicwork ticket ${ticketId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Failed to post to Atomicwork ticket ${ticketId}:`, error.message);
+    throw error;
+  }
+}
+
+function formatHTMLResponse(intent, result) {
+  if (!result.success) {
+    return `<div style="padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+      <h3 style="color: #856404; margin: 0 0 10px 0;">⚠️ ${result.message}</h3>
+      ${result.suggestions ? `<p style="margin: 10px 0 0 0; font-size: 13px;"><strong>Suggestions:</strong></p><ul style="margin: 5px 0; padding-left: 20px; font-size: 13px;">${result.suggestions.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
+    </div>`;
+  }
+
+  switch (intent) {
+    case 'apply_leave':
+      return formatLeaveApplicationHTML(result);
+
+    case 'check_leave_balance':
+      return formatLeaveBalanceHTML(result);
+
+    case 'mark_attendance':
+      return formatAttendanceHTML(result);
+
+    case 'submit_reimbursement':
+      return formatReimbursementHTML(result);
+
+    case 'create_po':
+      return formatPurchaseOrderHTML(result);
+
+    case 'submit_invoice':
+      return formatInvoiceHTML(result);
+
+    case 'generate_payslip':
+    case 'generate_tax':
+    case 'generate_insurance':
+    case 'generate_letter':
+      return formatDocumentHTML(result);
+
+    default:
+      return `<div style="padding: 15px; background-color: #e7f3ff; border-left: 4px solid #2196F3; border-radius: 4px;">
+        <h3 style="color: #0c5460; margin: 0 0 10px 0;">✅ ${result.message}</h3>
+      </div>`;
+  }
+}
+
+function formatLeaveApplicationHTML(result) {
+  const data = result.data;
+  const statusColor = data.status === 'approved' ? '#28a745' : '#ffc107';
+  const statusIcon = data.status === 'approved' ? '✅' : '⏳';
+
+  return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid ${statusColor}; border-radius: 4px; font-family: Arial, sans-serif;">
+    <h2 style="color: ${statusColor}; margin: 0 0 15px 0;">${statusIcon} Leave Request ${data.status === 'approved' ? 'Approved' : 'Submitted'}</h2>
+
+    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px; overflow: hidden;">
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #dee2e6;">Request ID</td>
+        <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">${data.id}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #dee2e6;">Employee</td>
+        <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">${data.employeeName}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #dee2e6;">Leave Type</td>
+        <td style="padding: 12px; border-bottom: 1px solid #dee2e6; text-transform: capitalize;">${data.type}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #dee2e6;">Duration</td>
+        <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">${data.days} day(s)</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #dee2e6;">Start Date</td>
+        <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">${data.startDate}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold; border-bottom: 1px solid #dee2e6;">End Date</td>
+        <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">${data.endDate}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Status</td>
+        <td style="padding: 12px;"><span style="background-color: ${statusColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; text-transform: uppercase;">${data.status}</span></td>
+      </tr>
+    </table>
+
+    ${result.updatedBalance ? `<div style="margin-top: 15px; padding: 12px; background-color: #e7f3ff; border-radius: 4px;">
+      <strong>Updated Leave Balance:</strong><br/>
+      <span style="font-size: 13px;">Annual: ${result.updatedBalance.annual} | Sick: ${result.updatedBalance.sick} | Personal: ${result.updatedBalance.personal}</span>
+    </div>` : ''}
+
+    <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Generated by Sage HR System</p>
+  </div>`;
+}
+
+function formatLeaveBalanceHTML(result) {
+  const data = result.data;
+  return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #2196F3; border-radius: 4px; font-family: Arial, sans-serif;">
+    <h2 style="color: #2196F3; margin: 0 0 15px 0;">📊 Leave Balance - ${data.employeeName}</h2>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;">
+        <div style="font-size: 32px; font-weight: bold;">${data.balance.annual}</div>
+        <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Annual Leave</div>
+      </div>
+      <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;">
+        <div style="font-size: 32px; font-weight: bold;">${data.balance.sick}</div>
+        <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Sick Leave</div>
+      </div>
+      <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;">
+        <div style="font-size: 32px; font-weight: bold;">${data.balance.personal}</div>
+        <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Personal Leave</div>
+      </div>
+    </div>
+
+    <div style="background-color: white; padding: 15px; border-radius: 4px; border: 2px solid #2196F3;">
+      <strong style="color: #2196F3;">Total Available:</strong> <span style="font-size: 24px; font-weight: bold;">${data.total}</span> days
+    </div>
+
+    <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Generated by Sage HR System</p>
+  </div>`;
+}
+
+function formatAttendanceHTML(result) {
+  const data = result.data;
+  return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #28a745; border-radius: 4px; font-family: Arial, sans-serif;">
+    <h2 style="color: #28a745; margin: 0 0 15px 0;">✅ Attendance Marked</h2>
+
+    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px;">
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Employee</td>
+        <td style="padding: 12px;">${data.employeeName}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Date</td>
+        <td style="padding: 12px;">${data.date}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Check-in Time</td>
+        <td style="padding: 12px;">${new Date(data.checkIn).toLocaleString()}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Status</td>
+        <td style="padding: 12px;"><span style="background-color: #28a745; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px;">PRESENT</span></td>
+      </tr>
+    </table>
+
+    <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Generated by Sage HR System</p>
+  </div>`;
+}
+
+function formatReimbursementHTML(result) {
+  const data = result.data;
+  const statusColor = data.status === 'approved' ? '#28a745' : '#ffc107';
+  const statusIcon = data.status === 'approved' ? '✅' : '⏳';
+
+  return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid ${statusColor}; border-radius: 4px; font-family: Arial, sans-serif;">
+    <h2 style="color: ${statusColor}; margin: 0 0 15px 0;">${statusIcon} Reimbursement ${data.status === 'approved' ? 'Approved' : 'Submitted'}</h2>
+
+    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px;">
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Request ID</td>
+        <td style="padding: 12px;">${data.id}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Employee</td>
+        <td style="padding: 12px;">${data.employeeName}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Amount</td>
+        <td style="padding: 12px; font-size: 18px; font-weight: bold; color: #28a745;">S$ ${data.amount.toFixed(2)}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Category</td>
+        <td style="padding: 12px;">${data.category}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Description</td>
+        <td style="padding: 12px;">${data.description}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Status</td>
+        <td style="padding: 12px;"><span style="background-color: ${statusColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; text-transform: uppercase;">${data.status}</span></td>
+      </tr>
+    </table>
+
+    <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Generated by Sage HR System</p>
+  </div>`;
+}
+
+function formatPurchaseOrderHTML(result) {
+  const data = result.data;
+  const statusColor = data.status === 'approved' ? '#28a745' : '#ffc107';
+
+  return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid ${statusColor}; border-radius: 4px; font-family: Arial, sans-serif;">
+    <h2 style="color: ${statusColor}; margin: 0 0 15px 0;">📦 Purchase Order ${data.status === 'approved' ? 'Approved' : 'Submitted'}</h2>
+
+    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px;">
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">PO Number</td>
+        <td style="padding: 12px;">${data.id}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Requested By</td>
+        <td style="padding: 12px;">${data.requestedBy}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Amount</td>
+        <td style="padding: 12px; font-size: 18px; font-weight: bold; color: #2196F3;">S$ ${data.amount.toFixed(2)}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Vendor</td>
+        <td style="padding: 12px;">${data.vendor}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Description</td>
+        <td style="padding: 12px;">${data.description}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Status</td>
+        <td style="padding: 12px;"><span style="background-color: ${statusColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; text-transform: uppercase;">${data.status}</span></td>
+      </tr>
+    </table>
+
+    <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Generated by Sage HR System</p>
+  </div>`;
+}
+
+function formatInvoiceHTML(result) {
+  const data = result.data;
+
+  return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #6c757d; border-radius: 4px; font-family: Arial, sans-serif;">
+    <h2 style="color: #6c757d; margin: 0 0 15px 0;">🧾 Invoice Submitted</h2>
+
+    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px;">
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Invoice Number</td>
+        <td style="padding: 12px;">${data.id}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Submitted By</td>
+        <td style="padding: 12px;">${data.submittedBy}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Amount</td>
+        <td style="padding: 12px; font-size: 18px; font-weight: bold;">S$ ${data.amount.toFixed(2)}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Vendor</td>
+        <td style="padding: 12px;">${data.vendor}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Description</td>
+        <td style="padding: 12px;">${data.description}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Status</td>
+        <td style="padding: 12px;"><span style="background-color: #6c757d; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; text-transform: uppercase;">${data.status}</span></td>
+      </tr>
+    </table>
+
+    <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Generated by Sage HR System</p>
+  </div>`;
+}
+
+function formatDocumentHTML(result) {
+  const data = result.data;
+  const baseURL = process.env.BASE_URL || 'https://esm-demo.onrender.com';
+  const downloadURL = `${baseURL}${data.filePath}`;
+
+  return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #17a2b8; border-radius: 4px; font-family: Arial, sans-serif;">
+    <h2 style="color: #17a2b8; margin: 0 0 15px 0;">📄 ${data.title} Generated</h2>
+
+    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px; margin-bottom: 15px;">
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Document Type</td>
+        <td style="padding: 12px; text-transform: capitalize;">${data.type.replace('_', ' ')}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Employee</td>
+        <td style="padding: 12px;">${data.employeeName}</td>
+      </tr>
+      <tr style="background-color: #f1f3f5;">
+        <td style="padding: 12px; font-weight: bold;">Country</td>
+        <td style="padding: 12px;">🇸🇬 ${data.country}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; font-weight: bold;">Generated At</td>
+        <td style="padding: 12px;">${new Date(data.generatedAt).toLocaleString()}</td>
+      </tr>
+    </table>
+
+    <a href="${downloadURL}" target="_blank" style="display: inline-block; background-color: #17a2b8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+      📥 Download ${data.title}
+    </a>
+
+    <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Click the link above to view and download your document. You can print to PDF from your browser.</p>
+    <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Generated by Sage HR System</p>
+  </div>`;
+}
+
+async function handleDocumentGeneration(text, employeeId, intent) {
+  // Parse document type and params from text
+  let docType, params = {};
+
+  if (intent === 'generate_payslip' || text.toLowerCase().includes('payslip')) {
+    docType = 'payslip';
+    // Extract month and year
+    const monthMatch = text.match(/(january|february|march|april|may|june|july|august|september|october|november|december)/i);
+    const yearMatch = text.match(/20\d{2}/);
+    params.month = monthMatch ? monthMatch[0].charAt(0).toUpperCase() + monthMatch[0].slice(1).toLowerCase() : new Date().toLocaleString('default', { month: 'long' });
+    params.year = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
+  } else if (intent === 'generate_tax' || text.toLowerCase().includes('tax') || text.toLowerCase().includes('ir8a')) {
+    docType = 'tax_statement';
+    const yearMatch = text.match(/20\d{2}/);
+    params.year = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear() - 1;
+  } else if (intent === 'generate_insurance' || text.toLowerCase().includes('insurance') || text.toLowerCase().includes('medishield')) {
+    docType = 'insurance_card';
+  } else if (intent === 'generate_letter' || text.toLowerCase().includes('employment letter') || text.toLowerCase().includes('verification')) {
+    docType = 'employment_letter';
+    if (text.toLowerCase().includes('bank') || text.toLowerCase().includes('loan')) {
+      params.purpose = 'Bank Loan';
+    } else if (text.toLowerCase().includes('visa')) {
+      params.purpose = 'Visa Application';
+    } else if (text.toLowerCase().includes('hdb')) {
+      params.purpose = 'HDB Application';
+    } else {
+      params.purpose = 'General';
+    }
+  }
+
+  // Call document generator
+  const documentGenerator = require('./document-generator-sg');
+  const employee = findEmployeeById(employeeId);
+
+  if (!employee) {
+    return { success: false, message: 'Employee not found' };
+  }
+
+  let doc;
+  switch (docType) {
+    case 'payslip':
+      doc = documentGenerator.generatePayslipSG(employee, params.month, params.year);
+      break;
+    case 'tax_statement':
+      doc = documentGenerator.generateTaxStatementSG(employee, params.year);
+      break;
+    case 'insurance_card':
+      doc = documentGenerator.generateInsuranceCardSG(employee);
+      break;
+    case 'employment_letter':
+      doc = documentGenerator.generateEmploymentLetterSG(employee, params.purpose);
+      break;
+    default:
+      return { success: false, message: 'Unknown document type' };
+  }
+
+  return {
+    success: true,
+    message: `${doc.title} generated successfully`,
+    data: doc
+  };
+}
 
 // ==================== BUSINESS LOGIC FUNCTIONS ====================
 function processLeaveApplication(details, metadata = {}) {
