@@ -26681,6 +26681,13 @@ let invoices = [
 ];
 
 // ==================== HELPER FUNCTIONS ====================
+// Helper function to calculate end date
+function calculateEndDate(startDateStr, days) {
+  const date = new Date(startDateStr);
+  date.setDate(date.getDate() + (days - 1)); // -1 because start date is inclusive
+  return date.toISOString().split('T')[0];
+}
+
 // Helper function to find employee by ID (handles both string and integer)
 function findEmployeeById(employeeId) {
   if (!employeeId) return null;
@@ -27346,7 +27353,7 @@ function processLeaveApplication(details, metadata = {}) {
     employeeName: employeeName,
     type: leaveType,
     startDate: details.startDate || new Date().toISOString().split('T')[0],
-    endDate: details.endDate || new Date().toISOString().split('T')[0],
+    endDate: details.endDate || (details.startDate ? calculateEndDate(details.startDate, days) : calculateEndDate(new Date().toISOString().split('T')[0], days)),
     days: days,
     status: 'approved', // Auto-approve all requests from NLP webhook as they are pre-verified
     appliedAt: new Date().toISOString(),
