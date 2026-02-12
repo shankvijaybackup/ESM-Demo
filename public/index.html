@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sage HR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            background: white;
+            border-bottom: 1px solid #e1e4e8;
+            padding: 0 30px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0066cc;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #e1e4e8;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1e4e8;
+            background: #f9fafb;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 5px;
+        }
+
+        .employee-count {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .employee-list {
+            padding: 10px 0;
+        }
+
+        .employee-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .employee-item:hover {
+            background: #f9fafb;
+        }
+
+        .employee-item.active {
+            background: #eff6ff;
+            border-left: 3px solid #0066cc;
+        }
+
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .employee-item.active .employee-avatar {
+            background: linear-gradient(135deg, #0066cc 0%, #004999 100%);
+        }
+
+        .employee-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .employee-name {
+            font-weight: 600;
+            color: #111827;
+            font-size: 14px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .employee-meta {
+            font-size: 12px;
+            color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #f5f7fa;
+        }
+
+        .content-inner {
+            padding: 30px;
+        }
+
+        .profile-header {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 32px;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 5px;
+        }
+
+        .profile-title {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #6b7280;
+            flex-wrap: wrap;
+        }
+
+        .profile-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 18px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .tabs {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            color: #0066cc;
+            background: white;
+        }
+
+        .tab-button.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table thead {
+            background: #f9fafb;
+        }
+
+        .data-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #111827;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-matched, .badge-paid {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-present {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .filter-buttons {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: #0066cc;
+            color: #0066cc;
+        }
+
+        .filter-btn.active {
+            background: #0066cc;
+            color: white;
+            border-color: #0066cc;
+        }
+
+        @media (max-width: 968px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e1e4e8;
+                max-height: 300px;
+            }
+
+            .app-header {
+                padding: 0 15px;
+                height: auto;
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+            }
+
+            .search-bar {
+                margin: 15px 0 0 0;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="logo">Sage HR</div>
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input
+                type="text"
+                id="employeeSearch"
+                class="search-input"
+                placeholder="Search employees by name, email, or department..."
+                autocomplete="off">
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Employees</div>
+                <div class="employee-count" id="employeeCount">Loading...</div>
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterEmployees('all')">All</button>
+                <button class="filter-btn" onclick="filterEmployees('Engineering')">Engineering</button>
+                <button class="filter-btn" onclick="filterEmployees('Sales')">Sales</button>
+                <button class="filter-btn" onclick="filterEmployees('Marketing')">Marketing</button>
+                <button class="filter-btn" onclick="filterEmployees('Finance')">Finance</button>
+                <button class="filter-btn" onclick="filterEmployees('HR')">HR</button>
+            </div>
+            <div class="employee-list" id="employeeList">
+                <div style="padding: 20px; text-align: center; color: #9ca3af;">Loading employees...</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="content-inner" id="contentInner">
+                <div class="profile-header">
+                    <div class="profile-top">
+                        <div class="profile-avatar" id="profileAvatar">A</div>
+                        <div class="profile-info">
+                            <h1 class="profile-name" id="profileName">-</h1>
+                            <div class="profile-title" id="profileTitle">-</div>
+                            <div class="profile-meta">
+                                <div class="profile-meta-item">
+                                    <span>📧</span>
+                                    <span id="profileEmail">-</span>
+                                </div>
+                                <div class="profile-meta-item">
+                                    <span>🏢</span>
+                                    <span id="profileDepartment">-</span>
+                                </div>
+                                <div class="profile-meta-item">
+                                    <span>📅</span>
+                                    <span>Joined <span id="profileJoinDate">-</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-label">Annual Leave</div>
+                            <div class="stat-value" id="statAnnual">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Sick Leave</div>
+                            <div class="stat-value" id="statSick">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Personal Leave</div>
+                            <div class="stat-value" id="statPersonal">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Employee ID</div>
+                            <div class="stat-value" id="statEmpId" style="font-size: 18px;">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab-nav">
+                        <button class="tab-button active" onclick="switchTab('leave')">
+                            📅 Leave
+                        </button>
+                        <button class="tab-button" onclick="switchTab('attendance')">
+                            ⏰ Attendance
+                        </button>
+                        <button class="tab-button" onclick="switchTab('reimbursements')">
+                            💰 Reimbursements
+                        </button>
+                        <button class="tab-button" onclick="switchTab('purchase-orders')">
+                            🛒 Purchase Orders
+                        </button>
+                        <button class="tab-button" onclick="switchTab('invoices')">
+                            📄 Invoices
+                        </button>
+                        <button class="tab-button" onclick="switchTab('documents')">
+                            📋 Documents
+                        </button>
+                    </div>
+
+                    <div id="tab-leave" class="tab-content active">
+                        <div id="leaveContent"></div>
+                    </div>
+
+                    <div id="tab-attendance" class="tab-content">
+                        <div id="attendanceContent"></div>
+                    </div>
+
+                    <div id="tab-reimbursements" class="tab-content">
+                        <div id="reimbursementsContent"></div>
+                    </div>
+
+                    <div id="tab-purchase-orders" class="tab-content">
+                        <div id="purchaseOrdersContent"></div>
+                    </div>
+
+                    <div id="tab-invoices" class="tab-content">
+                        <div id="invoicesContent"></div>
+                    </div>
+
+                    <div id="tab-documents" class="tab-content">
+                        <div id="documentsContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let currentEmployee = null;
+        let allEmployees = [];
+        let filteredEmployees = [];
+        let currentFilter = 'all';
+
+        // Load employees on page load
+        async function loadEmployees() {
+            try {
+                const response = await fetch(`${API_BASE}/employees`);
+                const result = await response.json();
+                allEmployees = result.data;
+                filteredEmployees = allEmployees;
+
+                document.getElementById('employeeCount').textContent = `${allEmployees.length} employees`;
+                renderEmployeeList();
+
+                // Auto-select first employee
+                if (allEmployees.length > 0) {
+                    selectEmployee(allEmployees[0].id);
+                }
+            } catch (error) {
+                console.error('Error loading employees:', error);
+            }
+        }
+
+        function renderEmployeeList() {
+            const container = document.getElementById('employeeList');
+
+            if (filteredEmployees.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #9ca3af;">No employees found</div>';
+                return;
+            }
+
+            container.innerHTML = filteredEmployees.map(emp => {
+                const displayName = emp.full_name || `${emp.first_name} ${emp.last_name || ''}`.trim();
+                const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const isActive = currentEmployee && currentEmployee.id === emp.id;
+
+                return `
+                    <div class="employee-item ${isActive ? 'active' : ''}" onclick="selectEmployee(${emp.id})">
+                        <div class="employee-avatar">${initials}</div>
+                        <div class="employee-details">
+                            <div class="employee-name">${displayName}</div>
+                            <div class="employee-meta">${emp.department} • ${emp.position}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterEmployees(filter) {
+            currentFilter = filter;
+
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (filter === 'all') {
+                filteredEmployees = allEmployees;
+            } else {
+                filteredEmployees = allEmployees.filter(emp =>
+                    emp.department && emp.department.toLowerCase().includes(filter.toLowerCase())
+                );
+            }
+
+            document.getElementById('employeeCount').textContent = `${filteredEmployees.length} employees`;
+            renderEmployeeList();
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('employeeSearch');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase().trim();
+
+                if (query.length === 0) {
+                    filterEmployees(currentFilter);
+                    return;
+                }
+
+                filteredEmployees = allEmployees.filter(emp => {
+                    const fullName = (emp.full_name || `${emp.first_name} ${emp.last_name || ''}`).toLowerCase();
+                    const email = (emp.email || '').toLowerCase();
+                    const empId = (emp.employee_id || emp.id.toString()).toLowerCase();
+                    const dept = (emp.department || '').toLowerCase();
+
+                    return fullName.includes(query) ||
+                           email.includes(query) ||
+                           empId.includes(query) ||
+                           dept.includes(query);
+                });
+
+                document.getElementById('employeeCount').textContent = `${filteredEmployees.length} employees`;
+                renderEmployeeList();
+            }, 300);
+        });
+
+        // Select employee function
+        async function selectEmployee(empId) {
+            try {
+                const response = await fetch(`${API_BASE}/employees/${empId}`);
+                const result = await response.json();
+                currentEmployee = result.data;
+
+                const displayName = currentEmployee.full_name || `${currentEmployee.first_name} ${currentEmployee.last_name || ''}`.trim();
+                const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+                // Update profile header
+                document.getElementById('profileAvatar').textContent = initials;
+                document.getElementById('profileName').textContent = displayName;
+                document.getElementById('profileTitle').textContent = currentEmployee.position;
+                document.getElementById('profileEmail').textContent = currentEmployee.email;
+                document.getElementById('profileDepartment').textContent = currentEmployee.department;
+                document.getElementById('profileJoinDate').textContent = currentEmployee.joinDate;
+                document.getElementById('statAnnual').textContent = currentEmployee.leaveBalance.annual;
+                document.getElementById('statSick').textContent = currentEmployee.leaveBalance.sick;
+                document.getElementById('statPersonal').textContent = currentEmployee.leaveBalance.personal;
+                document.getElementById('statEmpId').textContent = currentEmployee.employee_id || currentEmployee.id;
+
+                // Update active state in list
+                renderEmployeeList();
+
+                // Load data for active tab
+                loadTabData();
+            } catch (error) {
+                console.error('Error loading employee data:', error);
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Load data for selected tab
+            loadTabData();
+        }
+
+        async function loadTabData() {
+            if (!currentEmployee) return;
+
+            const activeTab = document.querySelector('.tab-content.active').id.replace('tab-', '');
+
+            switch (activeTab) {
+                case 'leave':
+                    await loadLeaveRequests();
+                    break;
+                case 'attendance':
+                    await loadAttendance();
+                    break;
+                case 'reimbursements':
+                    await loadReimbursements();
+                    break;
+                case 'purchase-orders':
+                    await loadPurchaseOrders();
+                    break;
+                case 'invoices':
+                    await loadInvoices();
+                    break;
+                case 'documents':
+                    await loadDocuments();
+                    break;
+            }
+        }
+
+        async function loadLeaveRequests() {
+            try {
+                const response = await fetch(`${API_BASE}/leave-requests`);
+                const result = await response.json();
+                const container = document.getElementById('leaveContent');
+                const empLeaves = result.data.filter(l => l.employeeId == currentEmployee.id).slice(0, 20);
+
+                if (empLeaves.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📅</div>
+                            <div class="empty-state-text">No leave requests</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Days</th>
+                                    <th>Status</th>
+                                    <th>Applied</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                empLeaves.forEach(leave => {
+                    html += `
+                        <tr>
+                            <td><strong>${leave.type.charAt(0).toUpperCase() + leave.type.slice(1)}</strong></td>
+                            <td>${leave.startDate}</td>
+                            <td>${leave.endDate}</td>
+                            <td>${leave.days}</td>
+                            <td><span class="badge badge-${leave.status}">${leave.status}</span></td>
+                            <td>${new Date(leave.appliedAt).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading leave requests:', error);
+            }
+        }
+
+        async function loadAttendance() {
+            try {
+                const response = await fetch(`${API_BASE}/attendance`);
+                const result = await response.json();
+                const container = document.getElementById('attendanceContent');
+                const empAttendance = result.data.filter(a => a.employeeId == currentEmployee.id).slice(0, 30);
+
+                if (empAttendance.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">⏰</div>
+                            <div class="empty-state-text">No attendance records</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Hours</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                empAttendance.forEach(att => {
+                    const checkIn = new Date(att.checkIn).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    const checkOut = att.checkOut ? new Date(att.checkOut).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-';
+                    html += `
+                        <tr>
+                            <td><strong>${att.date}</strong></td>
+                            <td>${checkIn}</td>
+                            <td>${checkOut}</td>
+                            <td>${att.hoursWorked || '-'}</td>
+                            <td><span class="badge badge-present">${att.status}</span></td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading attendance:', error);
+            }
+        }
+
+        async function loadReimbursements() {
+            try {
+                const response = await fetch(`${API_BASE}/reimbursements`);
+                const result = await response.json();
+                const container = document.getElementById('reimbursementsContent');
+                const empReimb = result.data.filter(r => r.employeeId == currentEmployee.id);
+
+                if (empReimb.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💰</div>
+                            <div class="empty-state-text">No reimbursements</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                empReimb.forEach(reimb => {
+                    html += `
+                        <tr>
+                            <td>${reimb.description}</td>
+                            <td>${reimb.category.charAt(0).toUpperCase() + reimb.category.slice(1)}</td>
+                            <td><strong>$${reimb.amount}</strong></td>
+                            <td><span class="badge badge-${reimb.status}">${reimb.status}</span></td>
+                            <td>${new Date(reimb.submittedAt).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading reimbursements:', error);
+            }
+        }
+
+        async function loadPurchaseOrders() {
+            try {
+                const response = await fetch(`${API_BASE}/purchase-orders`);
+                const result = await response.json();
+                const container = document.getElementById('purchaseOrdersContent');
+
+                if (result.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🛒</div>
+                            <div class="empty-state-text">No purchase orders</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>PO Number</th>
+                                    <th>Vendor</th>
+                                    <th>Items</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                result.data.forEach(po => {
+                    html += `
+                        <tr>
+                            <td><strong>${po.poNumber}</strong></td>
+                            <td>${po.vendor}</td>
+                            <td>${Array.isArray(po.items) ? po.items.join(', ') : po.items}</td>
+                            <td><strong>$${po.amount}</strong></td>
+                            <td><span class="badge badge-pending">${po.status.replace('_', ' ')}</span></td>
+                            <td>${new Date(po.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading purchase orders:', error);
+            }
+        }
+
+        async function loadInvoices() {
+            try {
+                const response = await fetch(`${API_BASE}/invoices`);
+                const result = await response.json();
+                const container = document.getElementById('invoicesContent');
+
+                if (result.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📄</div>
+                            <div class="empty-state-text">No invoices</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Vendor</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Matched PO</th>
+                                    <th>Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                result.data.forEach(inv => {
+                    html += `
+                        <tr>
+                            <td><strong>${inv.invoiceNumber}</strong></td>
+                            <td>${inv.vendor}</td>
+                            <td><strong>$${inv.amount}</strong></td>
+                            <td><span class="badge badge-${inv.status === 'matched' || inv.status === 'paid' ? 'matched' : 'pending'}">${inv.status}</span></td>
+                            <td>${inv.matchedPO || '-'}</td>
+                            <td>${new Date(inv.submittedAt).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading invoices:', error);
+            }
+        }
+
+        async function loadDocuments() {
+            try {
+                const response = await fetch(`${API_BASE}/documents?employeeId=${currentEmployee.id}`);
+                const result = await response.json();
+                const container = document.getElementById('documentsContent');
+
+                if (result.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <div class="empty-state-text">No documents generated yet</div>
+                            <div style="margin-top: 20px;">
+                                <button onclick="generateDocument('tax_statement')" style="margin: 5px; padding: 10px 20px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Generate Tax Statement</button>
+                                <button onclick="generateDocument('payslip')" style="margin: 5px; padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 5px; cursor: pointer;">Generate Payslip</button>
+                                <button onclick="generateDocument('insurance_card')" style="margin: 5px; padding: 10px 20px; background: #8b5cf6; color: white; border: none; border-radius: 5px; cursor: pointer;">Generate Insurance Card</button>
+                                <button onclick="generateDocument('employment_letter')" style="margin: 5px; padding: 10px 20px; background: #f59e0b; color: white; border: none; border-radius: 5px; cursor: pointer;">Generate Employment Letter</button>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <div style="margin-bottom: 20px;">
+                        <button onclick="generateDocument('tax_statement')" style="margin: 5px; padding: 10px 20px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Tax Statement</button>
+                        <button onclick="generateDocument('payslip')" style="margin: 5px; padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Payslip</button>
+                        <button onclick="generateDocument('insurance_card')" style="margin: 5px; padding: 10px 20px; background: #8b5cf6; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Insurance Card</button>
+                        <button onclick="generateDocument('employment_letter')" style="margin: 5px; padding: 10px 20px; background: #f59e0b; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Employment Letter</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Title</th>
+                                    <th>Generated</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                result.data.forEach(doc => {
+                    const icon = doc.type === 'tax_statement' ? '📊' : doc.type === 'payslip' ? '💰' : doc.type === 'insurance_card' ? '🏥' : '📄';
+                    html += `
+                        <tr>
+                            <td>${icon} ${doc.type.replace('_', ' ').toUpperCase()}</td>
+                            <td><strong>${doc.title}</strong></td>
+                            <td>${new Date(doc.generatedAt).toLocaleDateString()}</td>
+                            <td>
+                                <a href="${doc.filePath}" target="_blank" style="padding: 8px 16px; background: #10b981; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">📥 View/Download</a>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading documents:', error);
+            }
+        }
+
+        async function generateDocument(type) {
+            try {
+                const params = {};
+
+                if (type === 'tax_statement') {
+                    params.year = 2025;
+                } else if (type === 'payslip') {
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    params.month = months[new Date().getMonth()];
+                    params.year = new Date().getFullYear();
+                } else if (type === 'employment_letter') {
+                    params.purpose = 'General';
+                }
+
+                const response = await fetch(`${API_BASE}/documents/generate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        employeeId: currentEmployee.id,
+                        type: type,
+                        country: 'Singapore',  // ✅ FIXED: Always use Singapore format
+                        params: params
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`✅ ${result.data.title} generated successfully!`);
+                    loadDocuments();
+                } else {
+                    alert(`❌ Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error generating document:', error);
+                alert('Error generating document');
+            }
+        }
+
+        // Initialize
+        loadEmployees();
+
+        // Auto-refresh every 10 seconds
+        setInterval(() => {
+            if (currentEmployee) {
+                loadTabData();
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

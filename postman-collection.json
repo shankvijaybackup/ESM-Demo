@@ -1,0 +1,441 @@
+{
+  "info": {
+    "name": "Sage HR Mock API",
+    "description": "Complete NLP-driven HR system for Atomicwork ESM demo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Get All Employees",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees"]
+            }
+          }
+        },
+        {
+          "name": "Get Employee by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/employees/EMP001",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "EMP001"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "NLP Webhook",
+      "item": [
+        {
+          "name": "Apply Leave (Auto-approve 2 days)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Apply for 2 days annual leave from 2026-02-20 to 2026-02-21\",\n  \"employeeId\": \"EMP001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        },
+        {
+          "name": "Apply Leave (Manual approval 5 days)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Request 5 days sick leave from 2026-03-01 to 2026-03-05\",\n  \"employeeId\": \"EMP002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        },
+        {
+          "name": "Check Leave Balance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Check my leave balance\",\n  \"employeeId\": \"EMP001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        },
+        {
+          "name": "Mark Attendance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Mark my attendance\",\n  \"employeeId\": \"EMP001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        },
+        {
+          "name": "Submit Reimbursement $450 (Auto-approve)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Submit reimbursement for $450 travel expense\",\n  \"employeeId\": \"EMP003\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        },
+        {
+          "name": "Submit Reimbursement $850 (Manual approval)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Claim $850 for meal expenses\",\n  \"employeeId\": \"EMP002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        },
+        {
+          "name": "Create Purchase Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Create purchase order for $2500 vendor: ABC Textiles items: Cotton fabric, buttons\",\n  \"employeeId\": \"EMP002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        },
+        {
+          "name": "Submit Invoice (Matches PO)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Submit invoice #INV-2026-001 vendor: ABC Textiles $2500\",\n  \"employeeId\": \"EMP002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        },
+        {
+          "name": "Unknown Intent Test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"This is a random request that should not match any intent\",\n  \"employeeId\": \"EMP001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/nlp",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "nlp"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Leave Requests",
+      "item": [
+        {
+          "name": "Get All Leave Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leave-requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["leave-requests"]
+            }
+          }
+        },
+        {
+          "name": "Create Leave Request (REST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"EMP001\",\n  \"type\": \"annual\",\n  \"startDate\": \"2026-02-20\",\n  \"endDate\": \"2026-02-22\",\n  \"days\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/leave-requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["leave-requests"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Get All Attendance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance"]
+            }
+          }
+        },
+        {
+          "name": "Mark Attendance (REST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"EMP001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["attendance"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reimbursements",
+      "item": [
+        {
+          "name": "Get All Reimbursements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reimbursements",
+              "host": ["{{baseUrl}}"],
+              "path": ["reimbursements"]
+            }
+          }
+        },
+        {
+          "name": "Submit Reimbursement (REST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"EMP001\",\n  \"amount\": 450,\n  \"category\": \"travel\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reimbursements",
+              "host": ["{{baseUrl}}"],
+              "path": ["reimbursements"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Purchase Orders",
+      "item": [
+        {
+          "name": "Get All Purchase Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/purchase-orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase-orders"]
+            }
+          }
+        },
+        {
+          "name": "Create Purchase Order (REST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendor\": \"ABC Textiles\",\n  \"items\": \"Cotton fabric, buttons\",\n  \"amount\": 2500,\n  \"requestedBy\": \"EMP002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/purchase-orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase-orders"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices"]
+            }
+          }
+        },
+        {
+          "name": "Submit Invoice (REST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceNumber\": \"INV-2026-001\",\n  \"vendor\": \"ABC Textiles\",\n  \"amount\": 2500,\n  \"submittedBy\": \"EMP002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

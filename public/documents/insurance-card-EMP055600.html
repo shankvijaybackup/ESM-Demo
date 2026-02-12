@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insurance Card - 311 AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f0f0; margin: 0; }
+        .card-container { perspective: 1000px; }
+        .insurance-card { width: 350px; height: 220px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 25px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: bold; }
+        .chip { width: 40px; height: 30px; background: gold; border-radius: 5px; }
+        .card-number { font-size: 20px; font-weight: bold; letter-spacing: 2px; margin: 15px 0; }
+        .card-info { margin-top: 20px; }
+        .info-row { display: flex; justify-content: space-between; margin: 8px 0; }
+        .label { font-size: 10px; opacity: 0.8; text-transform: uppercase; }
+        .value { font-size: 14px; font-weight: 600; }
+        .validity { position: absolute; bottom: 15px; right: 25px; font-size: 11px; }
+        .print-btn { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        @media print { .print-btn { display: none; } body { background: white; } }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">Print Card</button>
+
+    <div class="card-container">
+        <div class="insurance-card">
+            <div class="card-header">
+                <div class="logo">🏥 HealthCare+</div>
+                <div class="chip"></div>
+            </div>
+
+            <div class="card-number">POLEMP0556002026</div>
+
+            <div class="card-info">
+                <div class="info-row">
+                    <div>
+                        <div class="label">Card Holder</div>
+                        <div class="value">311 AI</div>
+                    </div>
+                    <div>
+                        <div class="label">Employee ID</div>
+                        <div class="value">EMP055600</div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div>
+                        <div class="label">Coverage</div>
+                        <div class="value">₹ 5,00,000</div>
+                    </div>
+                    <div>
+                        <div class="label">Type</div>
+                        <div class="value">Family Floater</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="validity">
+                Valid: 2026-01-01 to 2026-12-31
+            </div>
+        </div>
+    </div>
+
+    <div style="max-width: 600px; margin: 40px auto; padding: 30px; background: white; border-radius: 10px;">
+        <h2>Policy Details</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold;">Policy Number:</td>
+                <td style="padding: 12px;">POLEMP0556002026</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold;">Insured Person:</td>
+                <td style="padding: 12px;">311 AI</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold;">Sum Insured:</td>
+                <td style="padding: 12px;">₹ 5,00,000</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold;">Policy Period:</td>
+                <td style="padding: 12px;">2026-01-01 to 2026-12-31</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold;">Premium:</td>
+                <td style="padding: 12px;">₹ 15,000 (Annual)</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; font-weight: bold;">Helpline:</td>
+                <td style="padding: 12px;">1800-123-4567</td>
+            </tr>
+        </table>
+
+        <div style="margin-top: 30px; padding: 20px; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 5px;">
+            <h3 style="margin-top: 0; color: #10b981;">Coverage Includes:</h3>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                <li>Hospitalization expenses</li>
+                <li>Pre and post hospitalization</li>
+                <li>Ambulance charges</li>
+                <li>Day care procedures</li>
+                <li>Maternity coverage (₹ 50,000)</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payslip - Aaron Eckerly</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f5f7fa; }
+        .payslip { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 3px solid #10b981; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #10b981; margin: 0; }
+        .period { text-align: center; font-size: 18px; color: #666; margin: 10px 0; }
+        .section { margin: 30px 0; }
+        .section h2 { color: #333; font-size: 16px; margin-bottom: 15px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .info-label { color: #666; }
+        .info-value { font-weight: bold; color: #333; }
+        .earnings, .deductions { background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .earnings h3 { color: #10b981; margin: 0 0 15px 0; }
+        .deductions h3 { color: #ef4444; margin: 0 0 15px 0; }
+        .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .total-row { font-weight: bold; font-size: 18px; background: #f0fdf4; padding: 15px; border-radius: 5px; margin-top: 10px; }
+        .net-salary { text-align: center; background: #10b981; color: white; padding: 20px; border-radius: 8px; margin: 30px 0; }
+        .net-salary .amount { font-size: 32px; font-weight: bold; }
+        .footer { margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 12px; }
+        .print-btn { background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+        @media print { .print-btn { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="payslip">
+        <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+        <div class="header">
+            <h1>PAYSLIP</h1>
+        </div>
+
+        <div class="period">
+            <strong>February 2026</strong>
+        </div>
+
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">Employee Name:</span>
+                    <span class="info-value">Aaron Eckerly</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Employee ID:</span>
+                    <span class="info-value">EMP054521</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Department:</span>
+                    <span class="info-value">General</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Designation:</span>
+                    <span class="info-value">Employee</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Pay Period:</span>
+                    <span class="info-value">February 2026</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Payment Date:</span>
+                    <span class="info-value">2/12/2026</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="earnings">
+            <h3>EARNINGS</h3>
+            <div class="row">
+                <span>Basic Salary</span>
+                <span>₹ 50,000</span>
+            </div>
+            <div class="row">
+                <span>House Rent Allowance (40%)</span>
+                <span>₹ 20,000</span>
+            </div>
+            <div class="row">
+                <span>Dearness Allowance (12%)</span>
+                <span>₹ 6,000</span>
+            </div>
+            <div class="row total-row">
+                <span>GROSS EARNINGS</span>
+                <span>₹ 76,000</span>
+            </div>
+        </div>
+
+        <div class="deductions">
+            <h3>DEDUCTIONS</h3>
+            <div class="row">
+                <span>Provident Fund (12%)</span>
+                <span>₹ 6,000</span>
+            </div>
+            <div class="row">
+                <span>Income Tax (TDS)</span>
+                <span>₹ 7,600</span>
+            </div>
+            <div class="row">
+                <span>Professional Tax</span>
+                <span>₹ 200</span>
+            </div>
+            <div class="row total-row">
+                <span>TOTAL DEDUCTIONS</span>
+                <span>₹ 13,800</span>
+            </div>
+        </div>
+
+        <div class="net-salary">
+            <div style="font-size: 16px; margin-bottom: 10px;">NET SALARY</div>
+            <div class="amount">₹ 62,400</div>
+            <div style="font-size: 14px; margin-top: 10px;">Amount in words: Sixty Two Thousand Four Hundred Zero Rupees Only</div>
+        </div>
+
+        <div class="footer">
+            <p><strong>This is a computer-generated payslip. No signature is required.</strong></p>
+            <p>For queries, contact HR Department | hr@company.com</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IR8A Form - Ananya Gupta</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        .header { text-align: center; border-bottom: 3px solid #dc143c; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #dc143c; margin: 0; }
+        .header p { color: #666; margin: 5px 0; }
+        .iras-logo { color: #dc143c; font-weight: bold; font-size: 24px; }
+        .section { margin: 30px 0; }
+        .section h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .info-grid { display: grid; grid-template-columns: 250px 1fr; gap: 15px; margin: 20px 0; }
+        .info-label { font-weight: bold; color: #666; }
+        .info-value { color: #333; }
+        .amount { font-size: 18px; font-weight: bold; color: #dc143c; }
+        .footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f5f7fa; font-weight: bold; }
+        .print-btn { background: #dc143c; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .highlight { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 20px 0; }
+        @media print { .print-btn { display: none; } }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+    <div class="header">
+        <div class="iras-logo">IRAS</div>
+        <h1>Form IR8A</h1>
+        <p>Statement of Employee's Remuneration</p>
+        <p>Year of Assessment 2025</p>
+    </div>
+
+    <div class="highlight">
+        <strong>⚠️ Important:</strong> This document is for employment verification purposes.
+        Please submit the official IR8A form to IRAS through your employer's Auto-Inclusion Scheme (AIS).
+    </div>
+
+    <div class="section">
+        <h2>Part 1: Employer's Particulars</h2>
+        <div class="info-grid">
+            <div class="info-label">Company Name:</div>
+            <div class="info-value">Company Name Pte Ltd</div>
+
+            <div class="info-label">Company UEN:</div>
+            <div class="info-value">201234567G</div>
+
+            <div class="info-label">Address:</div>
+            <div class="info-value">1 Marina Boulevard, #20-01, Singapore 018989</div>
+
+            <div class="info-label">Contact Number:</div>
+            <div class="info-value">+65 6123 4567</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Part 2: Employee's Particulars</h2>
+        <div class="info-grid">
+            <div class="info-label">Name:</div>
+            <div class="info-value">Ananya Gupta</div>
+
+            <div class="info-label">Employee ID:</div>
+            <div class="info-value">E1001</div>
+
+            <div class="info-label">NRIC/FIN:</div>
+            <div class="info-value">S1234567A</div>
+
+            <div class="info-label">Designation:</div>
+            <div class="info-value">Employee</div>
+
+            <div class="info-label">Department:</div>
+            <div class="info-value">Business Operations</div>
+
+            <div class="info-label">Period of Employment:</div>
+            <div class="info-value">2024-01-01 to Present</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Part 3: Income Details (Year 2024)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th style="text-align: right;">Amount (S$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Gross Salary</strong></td>
+                    <td style="text-align: right;"><strong>80,000</strong></td>
+                </tr>
+                <tr>
+                    <td>Basic Salary</td>
+                    <td style="text-align: right;">48,000</td>
+                </tr>
+                <tr>
+                    <td>Allowances (Transport, Meal, etc.)</td>
+                    <td style="text-align: right;">16,000</td>
+                </tr>
+                <tr>
+                    <td>Annual Bonus</td>
+                    <td style="text-align: right;">16,000</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Part 4: CPF Contributions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th style="text-align: right;">Amount (S$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Employee's CPF Contribution (20%)</td>
+                    <td style="text-align: right;">16,000</td>
+                </tr>
+                <tr>
+                    <td>Employer's CPF Contribution (17%)</td>
+                    <td style="text-align: right;">13,600</td>
+                </tr>
+                <tr style="font-weight: bold; background: #f5f7fa;">
+                    <td>Total CPF Contributions</td>
+                    <td style="text-align: right;">29,600</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Part 5: Benefits-in-Kind</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th style="text-align: right;">Value (S$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Company Car Benefit</td>
+                    <td style="text-align: right;">0</td>
+                </tr>
+                <tr>
+                    <td>Housing Accommodation</td>
+                    <td style="text-align: right;">0</td>
+                </tr>
+                <tr>
+                    <td>Others</td>
+                    <td style="text-align: right;">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Part 6: Summary</h2>
+        <div class="info-grid">
+            <div class="info-label">Total Income (Box 11):</div>
+            <div class="info-value amount">S$ 80,000</div>
+
+            <div class="info-label">Total CPF Contributions:</div>
+            <div class="info-value amount">S$ 29,600</div>
+
+            <div class="info-label">Tax Clearance Status:</div>
+            <div class="info-value">No Outstanding Tax</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>This is a computer-generated document. No signature is required.</strong></p>
+        <p>Generated on: 12/02/2026</p>
+        <p>For official tax filing, please refer to your IRAS Notice of Assessment</p>
+        <p style="margin-top: 15px; font-size: 11px;">
+            IRAS Contact: 1800 356 8300 | Website: www.iras.gov.sg
+        </p>
+    </div>
+</body>
+</html>

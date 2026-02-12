@@ -1,0 +1,192 @@
+=================================================================
+🎬 BODYNITS DEMO - COPY-PASTE COMMANDS
+Friday 13th Feb, 11 AM SGT
+=================================================================
+
+SERVER INFO:
+• Web UI: http://localhost:3000
+• API Base: http://localhost:3000/api
+• Webhook: http://localhost:3000/api/webhook/nlp
+
+=================================================================
+SCENARIO 1: LEAVE APPLICATION (AUTO-APPROVED)
+=================================================================
+
+Natural Language Request:
+"Apply for 2 days annual leave from Feb 20 to Feb 21"
+
+curl -X POST http://localhost:3000/api/webhook/nlp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Apply for 2 days annual leave from 2026-02-20 to 2026-02-21",
+    "employeeId": "EMP001"
+  }'
+
+Expected Result: Auto-approved (≤ 2 days policy)
+
+=================================================================
+SCENARIO 2: REIMBURSEMENT (AUTO-APPROVED < $500)
+=================================================================
+
+Natural Language Request:
+"Submit reimbursement for $450 travel expense"
+
+curl -X POST http://localhost:3000/api/webhook/nlp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Submit reimbursement for $450 travel expense",
+    "employeeId": "EMP003"
+  }'
+
+Expected Result: Auto-approved ($450 < $500 threshold)
+
+=================================================================
+SCENARIO 3: REIMBURSEMENT (MANUAL APPROVAL > $500)
+=================================================================
+
+Natural Language Request:
+"Claim $850 for meal expenses"
+
+curl -X POST http://localhost:3000/api/webhook/nlp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Claim $850 for meal expenses",
+    "employeeId": "EMP002"
+  }'
+
+Expected Result: Pending approval ($850 > $500 threshold)
+
+=================================================================
+SCENARIO 4: ATTENDANCE TRACKING
+=================================================================
+
+Natural Language Request:
+"Mark my attendance"
+
+curl -X POST http://localhost:3000/api/webhook/nlp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Mark my attendance",
+    "employeeId": "EMP005"
+  }'
+
+Expected Result: Attendance recorded with timestamp
+
+=================================================================
+SCENARIO 5: PURCHASE ORDER CREATION
+=================================================================
+
+Natural Language Request:
+"Create purchase order for $2500 vendor: ABC Textiles items: Cotton fabric, buttons"
+
+curl -X POST http://localhost:3000/api/webhook/nlp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Create purchase order for $2500 vendor: ABC Textiles items: Cotton fabric, buttons",
+    "employeeId": "EMP002"
+  }'
+
+Expected Result: PO created with unique PO number
+
+=================================================================
+SCENARIO 6: INVOICE SUBMISSION + 3-WAY MATCHING
+=================================================================
+
+Natural Language Request:
+"Submit invoice INV-2026-001 vendor: ABC Textiles $2500"
+
+curl -X POST http://localhost:3000/api/webhook/nlp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Submit invoice INV-2026-001 vendor: ABC Textiles $2500",
+    "employeeId": "EMP002"
+  }'
+
+Expected Result: Invoice matched with previous PO (vendor + amount)
+
+=================================================================
+CHECK LEAVE BALANCE
+=================================================================
+
+curl -X POST http://localhost:3000/api/webhook/nlp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Check my leave balance",
+    "employeeId": "EMP001"
+  }'
+
+=================================================================
+VIEW ALL DATA (REST API)
+=================================================================
+
+# Get all employees
+curl http://localhost:3000/api/employees | python3 -m json.tool
+
+# Get all leave requests
+curl http://localhost:3000/api/leave-requests | python3 -m json.tool
+
+# Get all reimbursements
+curl http://localhost:3000/api/reimbursements | python3 -m json.tool
+
+# Get all purchase orders
+curl http://localhost:3000/api/purchase-orders | python3 -m json.tool
+
+# Get all invoices
+curl http://localhost:3000/api/invoices | python3 -m json.tool
+
+# System health
+curl http://localhost:3000/api/health | python3 -m json.tool
+
+=================================================================
+EMPLOYEES IN SYSTEM
+=================================================================
+
+EMP001 - Sarah Chen (HR Manager)
+EMP002 - John Williams (Finance Director)
+EMP003 - Maria Rodriguez (Production Supervisor)
+EMP004 - David Kumar (IT Support)
+EMP005 - Lisa Anderson (Facilities Manager)
+
+=================================================================
+QUICK DEMO TEST (All 6 Use Cases)
+=================================================================
+
+./demo-test.sh
+
+=================================================================
+TROUBLESHOOTING
+=================================================================
+
+# Restart server
+npm start
+
+# Check if server is running
+curl http://localhost:3000/api/health
+
+# Kill process on port 3000
+kill -9 $(lsof -t -i:3000)
+
+# View logs
+tail -f /tmp/sage-hr.log
+
+=================================================================
+KEY TALKING POINTS
+=================================================================
+
+1. "AI completes work, not just routes tickets"
+2. "Business policies enforced automatically - no exceptions"
+3. "Single employee entry point for all departments"
+4. "Built for manufacturing operations, not generic ITSM"
+5. "Webhook integration = 10 minutes to connect with Atomicwork"
+
+=================================================================
+DIFFERENTIATION FROM FRESHSERVICE
+=================================================================
+
+Freshservice: Routes tickets → Manual approval → IT-centric
+Atomicwork: Completes work → AI approval → Business-centric
+
+Freshservice: "Your ticket has been submitted"
+Atomicwork: "Your request has been approved and processed"
+
+=================================================================

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tax Statement - Ananya Gupta</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        .header { text-align: center; border-bottom: 3px solid #0066cc; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #0066cc; margin: 0; }
+        .header p { color: #666; margin: 5px 0; }
+        .section { margin: 30px 0; }
+        .section h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .info-grid { display: grid; grid-template-columns: 200px 1fr; gap: 15px; margin: 20px 0; }
+        .info-label { font-weight: bold; color: #666; }
+        .info-value { color: #333; }
+        .amount { font-size: 18px; font-weight: bold; color: #0066cc; }
+        .footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f5f7fa; font-weight: bold; }
+        .print-btn { background: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        @media print { .print-btn { display: none; } }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+    <div class="header">
+        <h1>Income Tax Statement</h1>
+        <p>Form 16 - Financial Year 2024-2025</p>
+        <p>Assessment Year 2025-2026</p>
+    </div>
+
+    <div class="section">
+        <h2>Employee Details</h2>
+        <div class="info-grid">
+            <div class="info-label">Name:</div>
+            <div class="info-value">Ananya Gupta</div>
+
+            <div class="info-label">Employee ID:</div>
+            <div class="info-value">E1001</div>
+
+            <div class="info-label">Department:</div>
+            <div class="info-value">Business Operations</div>
+
+            <div class="info-label">Designation:</div>
+            <div class="info-value">Employee</div>
+
+            <div class="info-label">PAN Number:</div>
+            <div class="info-value">ABCDE1234F</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Income Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Particulars</th>
+                    <th style="text-align: right;">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Gross Salary</td>
+                    <td style="text-align: right;">80,000</td>
+                </tr>
+                <tr>
+                    <td>Professional Tax</td>
+                    <td style="text-align: right;">2,500</td>
+                </tr>
+                <tr>
+                    <td>Standard Deduction</td>
+                    <td style="text-align: right;">50,000</td>
+                </tr>
+                <tr style="font-weight: bold; background: #f5f7fa;">
+                    <td>Net Taxable Income</td>
+                    <td style="text-align: right;">27,500</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Tax Deductions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Section</th>
+                    <th>Description</th>
+                    <th style="text-align: right;">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>80C</td>
+                    <td>PPF, ELSS, Life Insurance</td>
+                    <td style="text-align: right;">1,50,000</td>
+                </tr>
+                <tr>
+                    <td>80D</td>
+                    <td>Health Insurance Premium</td>
+                    <td style="text-align: right;">25,000</td>
+                </tr>
+                <tr>
+                    <td>HRA</td>
+                    <td>House Rent Allowance</td>
+                    <td style="text-align: right;">60,000</td>
+                </tr>
+                <tr style="font-weight: bold; background: #f5f7fa;">
+                    <td colspan="2">Total Deductions</td>
+                    <td style="text-align: right;">2,35,000</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Tax Computation</h2>
+        <div class="info-grid">
+            <div class="info-label">Taxable Income:</div>
+            <div class="info-value amount">₹ -207,500</div>
+
+            <div class="info-label">Income Tax:</div>
+            <div class="info-value amount">₹ 12,000</div>
+
+            <div class="info-label">Cess (4%):</div>
+            <div class="info-value amount">₹ 480</div>
+
+            <div class="info-label">Total Tax Deducted:</div>
+            <div class="info-value amount">₹ 12,480</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>This is a computer-generated document. No signature is required.</strong></p>
+        <p>Generated on: 2/12/2026</p>
+        <p>Company Name | Address | Contact Details</p>
+    </div>
+</body>
+</html>
