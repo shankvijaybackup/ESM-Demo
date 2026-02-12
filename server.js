@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const axios = require('axios');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,17 @@ const ATOMICWORK_API_KEY = process.env.ATOMICWORK_API_KEY || 'aw_b2d3cda25daa479
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
+
+// Load Atomicwork users if file exists
+let atomicworkUsers = [];
+try {
+  const atomicworkData = fs.readFileSync(path.join(__dirname, 'atomicwork-users.json'), 'utf8');
+  const parsed = JSON.parse(atomicworkData);
+  atomicworkUsers = parsed.users || parsed || [];
+  console.log(`✅ Loaded ${atomicworkUsers.length} Atomicwork users`);
+} catch (error) {
+  console.log('ℹ️  No atomicwork-users.json found, using default employees only');
+}
 
 // ==================== DATA STORAGE ====================
 const employees = [
@@ -7545,6 +7557,41 @@ const employees = [
     "notification_enabled": true
   }
 ];
+
+// Merge Atomicwork users into employees array
+if (atomicworkUsers.length > 0) {
+  atomicworkUsers.forEach(user => {
+    // Check if user already exists
+    const exists = employees.find(e => e.email === user.email || e.employee_id === user.employee_id);
+    if (!exists) {
+      // Transform Atomicwork user to employee format
+      const newEmployee = {
+        id: user.id || Math.floor(Math.random() * 100000),
+        employee_id: user.employee_id || `EMP${String(user.id).padStart(6, '0')}`,
+        first_name: user.first_name || '',
+        middle_name: user.middle_name || null,
+        last_name: user.last_name || '',
+        full_name: user.full_name || `${user.first_name} ${user.last_name}`.trim(),
+        email: user.email,
+        personal_email: user.personal_email || null,
+        department: user.department || 'General',
+        position: user.position || user.designation || 'Employee',
+        joinDate: user.created_at || '2024-01-01',
+        leaveBalance: {
+          annual: 15,
+          sick: 10,
+          personal: 5
+        },
+        manager: user.manager_email || null,
+        phone: user.phone || null,
+        location: user.location || 'Singapore',
+        status: user.user_status || 'active'
+      };
+      employees.push(newEmployee);
+    }
+  });
+  console.log(`✅ Total employees after merge: ${employees.length}`);
+}
 
 let attendance = [];
 let leaveRequests = [
