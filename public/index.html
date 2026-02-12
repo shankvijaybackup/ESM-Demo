@@ -758,7 +758,12 @@
                 const response = await fetch(`${API_BASE}/leave-requests`);
                 const result = await response.json();
                 const container = document.getElementById('leaveContent');
-                const empLeaves = result.data.filter(l => l.employeeId == currentEmployee.id).slice(0, 20);
+                // Robust filtering: Match by numeric ID, string ID, or email
+                const empLeaves = result.data.filter(l => 
+                    l.employeeId == currentEmployee.id || 
+                    l.employeeId == currentEmployee.employee_id || 
+                    (currentEmployee.email && l.employeeId && l.employeeId.toString().toLowerCase() === currentEmployee.email.toLowerCase())
+                ).slice(0, 20);
 
                 if (empLeaves.length === 0) {
                     container.innerHTML = `
