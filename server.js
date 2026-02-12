@@ -26642,6 +26642,23 @@ function findEmployeeById(employeeId) {
 function parseNLPIntent(text) {
   const lowerText = text.toLowerCase();
 
+  // Document generation patterns (check first - very specific)
+  if (lowerText.match(/payslip|salary slip|pay slip|wage slip|pay stub/)) {
+    return { intent: 'generate_payslip', text };
+  }
+
+  if (lowerText.match(/tax statement|tax form|ir8a|ir8|form 16|tax certificate/)) {
+    return { intent: 'generate_tax', text };
+  }
+
+  if (lowerText.match(/insurance card|medishield|health insurance|medical card/)) {
+    return { intent: 'generate_insurance', text };
+  }
+
+  if (lowerText.match(/employment letter|employment verification|employment certificate|work verification|confirm employment|letter of employment/)) {
+    return { intent: 'generate_letter', text };
+  }
+
   // Reimbursement patterns (check first - more specific)
   if (lowerText.match(/reimburse|expense|claim|reimbursement/)) {
     return { intent: 'submit_reimbursement', text };
