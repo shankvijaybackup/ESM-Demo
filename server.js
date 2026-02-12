@@ -26757,12 +26757,41 @@ function parseNLPIntent(text) {
 function extractLeaveDetails(text) {
   const details = {};
 
-  // Extract dates
+  // Extract dates (YYYY-MM-DD or DD/MM/YYYY)
   const datePattern = /(\d{4}-\d{2}-\d{2})|(\d{1,2}\/\d{1,2}\/\d{4})/g;
-  const dates = text.match(datePattern);
-  if (dates && dates.length >= 2) {
-    details.startDate = dates[0];
-    details.endDate = dates[1];
+  let dates = text.match(datePattern) || [];
+
+  // Extract Natural Language Dates (e.g., "March 1st", "April 10", "2nd Jan")
+  const months = "january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec";
+  const nlpDatePattern = new RegExp(`(${months})\\s*(\\d{1,2})(?:st|nd|rd|th)?|(\\d{1,2})(?:st|nd|rd|th)?\\s*(${months})`, 'gi');
+
+  const nlpDates = [];
+  let match;
+  while ((match = nlpDatePattern.exec(text)) !== null) {
+    const monthStr = match[1] || match[4];
+    const dayStr = match[2] || match[3];
+
+    // Parse month index (0-11)
+    const monthIndex = new Date(Date.parse(monthStr + " 1, 2000")).getMonth();
+    const day = parseInt(dayStr);
+    const year = new Date().getFullYear(); // Default to current year
+
+    // Construct Date object and handle year rollover if needed (simple assumption for now)
+    // Format as YYYY-MM-DD
+    const dateObj = new Date(year, monthIndex, day);
+    // Adjust to local date string part manually to avoid timezone issues or use simple formatting
+    const formattedDate = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    nlpDates.push(formattedDate);
+  }
+
+  // Combine and sort dates
+  const allDates = [...dates, ...nlpDates].sort();
+
+  if (allDates.length >= 1) {
+    details.startDate = allDates[0];
+    if (allDates.length >= 2) {
+      details.endDate = allDates[allDates.length - 1]; // Take the last one as end date
+    }
   }
 
   // Extract leave type
@@ -27337,6 +27366,22 @@ function processLeaveApplication(details, metadata = {}) {
   const leaveType = details.type || 'annual';
   const days = details.days || 1;
 
+  // Strict Date Validation
+  if (!details.startDate) {
+    return {
+      success: false,
+      message: 'Please specify the start date for your leave (e.g., "from March 1st").'
+    };
+  }
+
+  // Calculate End Date if missing but days provided
+  let endDate = details.endDate;
+  if (!endDate && details.startDate && days > 1) {
+    endDate = calculateEndDate(details.startDate, days);
+  } else if (!endDate) {
+    endDate = details.startDate; // Single day leave
+  }
+
   // Check leave balance
   if (employee.leaveBalance[leaveType] < days) {
     return {
@@ -27352,8 +27397,8 @@ function processLeaveApplication(details, metadata = {}) {
     employeeId: details.employeeId,
     employeeName: employeeName,
     type: leaveType,
-    startDate: details.startDate || new Date().toISOString().split('T')[0],
-    endDate: details.endDate || (details.startDate ? calculateEndDate(details.startDate, days) : calculateEndDate(new Date().toISOString().split('T')[0], days)),
+    startDate: details.startDate,
+    endDate: endDate,
     days: days,
     status: 'approved', // Auto-approve all requests from NLP webhook as they are pre-verified
     appliedAt: new Date().toISOString(),
