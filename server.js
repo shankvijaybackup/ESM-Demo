@@ -24,9 +24,9 @@ try {
   const atomicworkData = fs.readFileSync(path.join(__dirname, 'atomicwork-users.json'), 'utf8');
   const parsed = JSON.parse(atomicworkData);
   atomicworkUsers = parsed.users || parsed || [];
-  console.log(` Loaded ${atomicworkUsers.length} Atomicwork users`);
+  console.log(`Loaded ${atomicworkUsers.length} Atomicwork users from atomicwork-users.json`);
 } catch (error) {
-  console.log('ℹ️  No atomicwork-users.json found, using default employees only');
+  console.log('No atomicwork-users.json found, using default employees only');
 }
 
 // ==================== DATA STORAGE ====================
