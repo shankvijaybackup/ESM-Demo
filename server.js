@@ -26683,7 +26683,15 @@ let invoices = [
 // ==================== HELPER FUNCTIONS ====================
 // Helper function to find employee by ID (handles both string and integer)
 function findEmployeeById(employeeId) {
-  return employees.find(e => e.id == employeeId || e.id === parseInt(employeeId));
+  if (!employeeId) return null;
+
+  return employees.find(e =>
+    e.id == employeeId ||
+    e.id === parseInt(employeeId) ||
+    e.employee_id === employeeId ||
+    e.email === employeeId ||
+    (e.email && employeeId && e.email.toLowerCase() === employeeId.toLowerCase())
+  );
 }
 
 function parseNLPIntent(text) {
