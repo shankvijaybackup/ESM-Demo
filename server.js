@@ -27380,12 +27380,14 @@ function getLeaveBalance(employeeId) {
     return { success: false, message: 'Employee not found' };
   }
 
+  const employeeName = employee.full_name || `${employee.first_name} ${employee.last_name || ''}`.trim();
+
   return {
     success: true,
-    message: `Leave balance for ${employee.name}`,
+    message: `Leave balance for ${employeeName}`,
     data: {
       employeeId: employee.id,
-      employeeName: employee.name,
+      employeeName: employeeName,
       balance: employee.leaveBalance,
       total: employee.leaveBalance.annual + employee.leaveBalance.sick + employee.leaveBalance.personal
     }
@@ -27426,7 +27428,7 @@ function markAttendance(employeeId, metadata = {}) {
 
   return {
     success: true,
-    message: `Attendance marked successfully for ${employee.name}`,
+    message: `Attendance marked successfully for ${employeeName}`,
     data: record
   };
 }
