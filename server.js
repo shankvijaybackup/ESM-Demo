@@ -24,7 +24,7 @@ try {
   const atomicworkData = fs.readFileSync(path.join(__dirname, 'atomicwork-users.json'), 'utf8');
   const parsed = JSON.parse(atomicworkData);
   atomicworkUsers = parsed.users || parsed || [];
-  console.log(`✅ Loaded ${atomicworkUsers.length} Atomicwork users`);
+  console.log(` Loaded ${atomicworkUsers.length} Atomicwork users`);
 } catch (error) {
   console.log('ℹ️  No atomicwork-users.json found, using default employees only');
 }
@@ -7590,7 +7590,7 @@ if (atomicworkUsers.length > 0) {
       employees.push(newEmployee);
     }
   });
-  console.log(`✅ Total employees after merge: ${employees.length}`);
+  console.log(` Total employees after merge: ${employees.length}`);
 }
 
 let attendance = [];
@@ -26914,7 +26914,7 @@ app.post('/api/webhook/nlp', async (req, res) => {
     if (ticketId || requestId) {
       const atomicworkTicketId = ticketId || requestId;
       const errorHTML = `<div style="padding: 15px; background-color: #fee; border-left: 4px solid #f44; border-radius: 4px;">
-        <h3 style="color: #f44; margin: 0 0 10px 0;">❌ Error Processing Request</h3>
+        <h3 style="color: #f44; margin: 0 0 10px 0;"> Error Processing Request</h3>
         <p style="margin: 0;"><strong>Error:</strong> ${error.message}</p>
         <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Please try again or contact HR support.</p>
       </div>`;
@@ -26946,10 +26946,10 @@ async function postToAtomicwork(ticketId, htmlDescription) {
         }
       }
     );
-    console.log(`✅ Posted to Atomicwork ticket ${ticketId}`);
+    console.log(` Posted to Atomicwork ticket ${ticketId}`);
     return response.data;
   } catch (error) {
-    console.error(`❌ Failed to post to Atomicwork ticket ${ticketId}:`, error.message);
+    console.error(` Failed to post to Atomicwork ticket ${ticketId}:`, error.message);
     throw error;
   }
 }
@@ -26957,7 +26957,7 @@ async function postToAtomicwork(ticketId, htmlDescription) {
 function formatHTMLResponse(intent, result) {
   if (!result.success) {
     return `<div style="padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
-      <h3 style="color: #856404; margin: 0 0 10px 0;">⚠️ ${result.message}</h3>
+      <h3 style="color: #856404; margin: 0 0 10px 0;"> ${result.message}</h3>
       ${result.suggestions ? `<p style="margin: 10px 0 0 0; font-size: 13px;"><strong>Suggestions:</strong></p><ul style="margin: 5px 0; padding-left: 20px; font-size: 13px;">${result.suggestions.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
     </div>`;
   }
@@ -26989,7 +26989,7 @@ function formatHTMLResponse(intent, result) {
 
     default:
       return `<div style="padding: 15px; background-color: #e7f3ff; border-left: 4px solid #2196F3; border-radius: 4px;">
-        <h3 style="color: #0c5460; margin: 0 0 10px 0;">✅ ${result.message}</h3>
+        <h3 style="color: #0c5460; margin: 0 0 10px 0;"> ${result.message}</h3>
       </div>`;
   }
 }
@@ -26997,7 +26997,7 @@ function formatHTMLResponse(intent, result) {
 function formatLeaveApplicationHTML(result) {
   const data = result.data;
   const statusColor = data.status === 'approved' ? '#28a745' : '#ffc107';
-  const statusIcon = data.status === 'approved' ? '✅' : '⏳';
+  const statusIcon = data.status === 'approved' ? '' : '';
 
   return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid ${statusColor}; border-radius: 4px; font-family: Arial, sans-serif;">
     <h2 style="color: ${statusColor}; margin: 0 0 15px 0;">${statusIcon} Leave Request ${data.status === 'approved' ? 'Approved' : 'Submitted'}</h2>
@@ -27045,7 +27045,7 @@ function formatLeaveApplicationHTML(result) {
 function formatLeaveBalanceHTML(result) {
   const data = result.data;
   return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #2196F3; border-radius: 4px; font-family: Arial, sans-serif;">
-    <h2 style="color: #2196F3; margin: 0 0 15px 0;">📊 Leave Balance - ${data.employeeName}</h2>
+    <h2 style="color: #2196F3; margin: 0 0 15px 0;"> Leave Balance - ${data.employeeName}</h2>
 
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
       <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;">
@@ -27073,7 +27073,7 @@ function formatLeaveBalanceHTML(result) {
 function formatAttendanceHTML(result) {
   const data = result.data;
   return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #28a745; border-radius: 4px; font-family: Arial, sans-serif;">
-    <h2 style="color: #28a745; margin: 0 0 15px 0;">✅ Attendance Marked</h2>
+    <h2 style="color: #28a745; margin: 0 0 15px 0;"> Attendance Marked</h2>
 
     <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px;">
       <tr style="background-color: #f1f3f5;">
@@ -27101,7 +27101,7 @@ function formatAttendanceHTML(result) {
 function formatReimbursementHTML(result) {
   const data = result.data;
   const statusColor = data.status === 'approved' ? '#28a745' : '#ffc107';
-  const statusIcon = data.status === 'approved' ? '✅' : '⏳';
+  const statusIcon = data.status === 'approved' ? '' : '';
 
   return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid ${statusColor}; border-radius: 4px; font-family: Arial, sans-serif;">
     <h2 style="color: ${statusColor}; margin: 0 0 15px 0;">${statusIcon} Reimbursement ${data.status === 'approved' ? 'Approved' : 'Submitted'}</h2>
@@ -27142,7 +27142,7 @@ function formatPurchaseOrderHTML(result) {
   const statusColor = data.status === 'approved' ? '#28a745' : '#ffc107';
 
   return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid ${statusColor}; border-radius: 4px; font-family: Arial, sans-serif;">
-    <h2 style="color: ${statusColor}; margin: 0 0 15px 0;">📦 Purchase Order ${data.status === 'approved' ? 'Approved' : 'Submitted'}</h2>
+    <h2 style="color: ${statusColor}; margin: 0 0 15px 0;"> Purchase Order ${data.status === 'approved' ? 'Approved' : 'Submitted'}</h2>
 
     <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px;">
       <tr style="background-color: #f1f3f5;">
@@ -27179,7 +27179,7 @@ function formatInvoiceHTML(result) {
   const data = result.data;
 
   return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #6c757d; border-radius: 4px; font-family: Arial, sans-serif;">
-    <h2 style="color: #6c757d; margin: 0 0 15px 0;">🧾 Invoice Submitted</h2>
+    <h2 style="color: #6c757d; margin: 0 0 15px 0;"> Invoice Submitted</h2>
 
     <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px;">
       <tr style="background-color: #f1f3f5;">
@@ -27218,7 +27218,7 @@ function formatDocumentHTML(result) {
   const downloadURL = `${baseURL}${data.filePath}`;
 
   return `<div style="padding: 20px; background-color: #f8f9fa; border-left: 4px solid #17a2b8; border-radius: 4px; font-family: Arial, sans-serif;">
-    <h2 style="color: #17a2b8; margin: 0 0 15px 0;">📄 ${data.title} Generated</h2>
+    <h2 style="color: #17a2b8; margin: 0 0 15px 0;"> ${data.title} Generated</h2>
 
     <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 4px; margin-bottom: 15px;">
       <tr style="background-color: #f1f3f5;">
@@ -27231,7 +27231,7 @@ function formatDocumentHTML(result) {
       </tr>
       <tr style="background-color: #f1f3f5;">
         <td style="padding: 12px; font-weight: bold;">Country</td>
-        <td style="padding: 12px;">🇸🇬 ${data.country}</td>
+        <td style="padding: 12px;"> ${data.country}</td>
       </tr>
       <tr>
         <td style="padding: 12px; font-weight: bold;">Generated At</td>
@@ -27240,7 +27240,7 @@ function formatDocumentHTML(result) {
     </table>
 
     <a href="${downloadURL}" target="_blank" style="display: inline-block; background-color: #17a2b8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
-      📥 Download ${data.title}
+       Download ${data.title}
     </a>
 
     <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Click the link above to view and download your document. You can print to PDF from your browser.</p>
