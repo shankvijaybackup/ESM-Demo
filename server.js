@@ -27394,7 +27394,7 @@ function processLeaveApplication(details, metadata = {}) {
 
   const leaveRequest = {
     id: `LV-${uuidv4().substring(0, 8)}`,
-    employeeId: details.employeeId,
+    employeeId: employee.id,
     employeeName: employeeName,
     type: leaveType,
     startDate: details.startDate,
